@@ -8,7 +8,7 @@ Notes for developers
 
 ### Requirements
 
-- Nodejs 14.x (use nvm (linux/mac)[https://github.com/nvm-sh/nvm] or (windows)[https://github.com/coreybutler/nvm-windows])
+- Nodejs 14.x (use nvm [linux/mac](https://github.com/nvm-sh/nvm) or [windows](https://github.com/coreybutler/nvm-windows))
 - yarn (`npm install -g yarn`)
 
 ### Run instructions
@@ -25,7 +25,7 @@ Run ganache to create a local blockchain (chainid = 333) with mnemonic keys `bit
 yarn start
 ```
 
-Deploy contract using truffle or (remix)[https://remix.ethereum.org]
+Deploy contract using truffle or [remix](https://remix.ethereum.org)
 
 - Truffle: `yarn migrate`
 - Remix: `yarn remix` (this will open a connection for remix IDE to connect to localhost)
