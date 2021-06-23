@@ -1,0 +1,42 @@
+{
+  "name": "@tuviella/contract",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": {
+    "email": "tuviella@tuviella.finance",
+    "name": "tuviella",
+    "url": "https://github.com/tuviella"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tuviella/tuviella-contract.git"
+  },
+  "homepage": "https://tuviella.github.io/tuviella-contract",
+  "keywords": [
+    "tuviella",
+    "blockchain",
+    "defi",
+    "token",
+    "meme",
+    "scam",
+    "polygon",
+    "matic"
+  ],
+  "scripts": {
+    "start": "ganache-cli --chainId 333 --networkId 333 -m 'bitter banner man sting lyrics eye speed immense inject roof dust marine'",
+    "remix": "remixd -s . --remix-ide https://remix.ethereum.org",
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "test": "truffle test"
+  },
+  "devDependencies": {
+    "@openzeppelin/test-environment": "0.1.9",
+    "@openzeppelin/test-helpers": "0.5.11",
+    "@remix-project/remixd": "0.4.0",
+    "ganache-cli": "6.12.2",
+    "truffle": "5.3.11"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "4.1.0"
+  }
+}
