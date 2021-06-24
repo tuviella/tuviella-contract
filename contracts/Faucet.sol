@@ -50,7 +50,6 @@ contract Faucet {
     if(vaciar){
       vaciarFaucet();
     }
-    token = address(0);
   }
 
   function vaciarFaucet() external onlyAdmin{
