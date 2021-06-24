@@ -46,7 +46,7 @@ contract Faucet {
   }
 
   function vaciarFaucet() external onlyAdmin{
-    token.transfer(token.balanceOf(address(this), admin);
+    token.transfer(token.balanceOf(address(this), admin));
   }
   
   function setAdmin(address newAdmin) external onlyAdmin{
