@@ -32,7 +32,6 @@ contract Faucet {
   function claimed() external{
     uint256 amount = 100 * 10**18;
     require(expiryOf[msg.sender] < block.timestamp + secs);
-    require(token.balanceOf(address(this)) >  amount);
     token.transfer(msg.sender, amount);
     expiryOf[msg.sender] = block.timestamp + secs;
   }
