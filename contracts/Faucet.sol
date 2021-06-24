@@ -46,12 +46,6 @@ contract Faucet {
     secs = _secs;
   }
 
-  function apagar(bool vaciar) external onlyAdmin{
-    if(vaciar){
-      vaciarFaucet();
-    }
-  }
-
   function vaciarFaucet() external onlyAdmin{
     token.transfer(token.balanceOf(address(this), admin);
   }
