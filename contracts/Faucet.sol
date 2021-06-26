@@ -26,7 +26,7 @@ contract Faucet {
     require(msg.sender == adminFaucet);
     _;
   }
-  modifier onlyAdmin(){
+  modifier onlyOwner(){
     require(owner[token] == msg.sender);
     _;
   }
