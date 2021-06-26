@@ -14,42 +14,48 @@ contract IERC20 {
 }
 
 contract Faucet {
-  address admin;
-  mapping(address=>uint) expiryOf;
-  IERC20 token;
-  uint16 secs;
+  mapping(IERC20=>mapping(address=>uint)) expiryOf;
+  mapping(IERC20=>address) owner;
+  mapping(IERC20=>uint16) secs;
 
   constructor() {
-    secs = 86400;
-    admin = msg.sender;
+    adminFaucet = msg.sender;
   }
 
   modifier onlyAdmin(){
-    require(msg.sender == admin);
+    require(msg.sender == adminFaucet);
+    _;
+  }
+  modifier onlyAdmin(){
+    require(owner[token] == msg.sender);
     _;
   }
 
-  function claimed() external{
-    uint256 amount = 100 * 10**18;
-    require(expiryOf[msg.sender] < block.timestamp + secs);
+  function receiveTokens(uint amount, IERC20 token) external{
+    require(owner[token] == address(0));
+    owner[token] = msg.sender;
+  }
+
+  function claimed(IERC20 token, uint amount) external{
+    uint256 amount = amount;
+    require(expiryOf[token][msg.sender] < block.timestamp + secs);
     token.transfer(msg.sender, amount);
-    expiryOf[msg.sender] = block.timestamp + secs;
+    expiryOf[token][msg.sender] = block.timestamp + secs;
   }
 
-  function setToken(IERC20 _token) external onlyAdmin{
-    require(msg.sender == admin);
-    token = _token;
+  function setSecs(uint16 _secs, IERC20 token) external onlyAdmin{
+    secs[token] = _secs;
   }
 
-  function setSecs(uint16 _secs) external onlyAdmin{
-    secs = _secs;
+  function vaciarFaucet(IERC20 token) external onlyOwner{
+    token.transfer(token.balanceOf(address(this), msg.sender));
   }
 
-  function vaciarFaucet() external onlyAdmin{
-    token.transfer(token.balanceOf(address(this), admin));
-  }
+
+  //Para subir al contrato de admins
+  address adminFaucet;
   
   function setAdmin(address newAdmin) external onlyAdmin{
-    admin = newAdmin;
+    adminFaucet = newAdmin;
   }
 }
