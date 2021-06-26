@@ -14,9 +14,11 @@ interface IERC20 {
 }
 
 contract Faucet {
+
   mapping(IERC20=>mapping(address=>uint)) expiryOf;
   mapping(IERC20=>address) owner;
   mapping(IERC20=>uint16) secs;
+  mapping(IERC20=>uint) amount;
 
   constructor() public {
     adminFaucet = msg.sender;
@@ -37,7 +39,7 @@ contract Faucet {
     token.transfer(address(this), amount);
   }
 
-  function claimed(IERC20 token, uint amount) external{
+  function claimed(IERC20 token) external{
     require(expiryOf[token][msg.sender] < block.timestamp + secs[token]);
     token.transfer(msg.sender, amount);
     expiryOf[token][msg.sender] = block.timestamp + secs[token];
@@ -45,6 +47,9 @@ contract Faucet {
 
   function setSecs(uint16 _secs, IERC20 token) external onlyAdmin{
     secs[token] = _secs;
+  }
+  function setAmount(uint16 _amount, IERC20 token) external onlyOwner{
+    amount[token] = _amount;
   }
 
   function vaciarFaucet(IERC20 token) external onlyOwner(token){
