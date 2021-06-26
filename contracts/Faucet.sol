@@ -2,15 +2,10 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 interface IERC20 {
-    function totalSupply() external view returns (uint);
     function balanceOf(address tokenOwner) external view returns (uint balance);
-    function allowance(address tokenOwner, address spender) external view returns (uint remaining);
     function transfer(address to, uint tokens) external returns (bool success);
-    function approve(address spender, uint tokens) external returns (bool success);
-    function transferFrom(address from, address to, uint tokens) external returns (bool success);
 
     event Transfer(address indexed from, address indexed to, uint tokens);
-    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
 
 contract Faucet {
@@ -18,7 +13,7 @@ contract Faucet {
   mapping(IERC20=>mapping(address=>uint)) expiryOf;
   mapping(IERC20=>address) owner;
   mapping(IERC20=>uint16) secs;
-  mapping(IERC20=>uint) amount;
+  mapping(IERC20=>uint) amounts;
 
   constructor() public {
     adminFaucet = msg.sender;
@@ -41,15 +36,15 @@ contract Faucet {
 
   function claimed(IERC20 token) external{
     require(expiryOf[token][msg.sender] < block.timestamp + secs[token]);
-    token.transfer(msg.sender, amount);
+    token.transfer(msg.sender, amounts[token]);
     expiryOf[token][msg.sender] = block.timestamp + secs[token];
   }
 
   function setSecs(uint16 _secs, IERC20 token) external onlyAdmin{
     secs[token] = _secs;
   }
-  function setAmount(uint16 _amount, IERC20 token) external onlyOwner{
-    amount[token] = _amount;
+  function setAmount(uint16 amount, IERC20 token) external onlyOwner(token){
+    amounts[token] = amount;
   }
 
   function vaciarFaucet(IERC20 token) external onlyOwner(token){
