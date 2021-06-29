@@ -18,7 +18,7 @@ contract('Faucet', (accounts) => {
     instanceF = await Faucet.deployed(masterChef);
     fau_addr = instanceF.address;
     fau = new web3.eth.Contract(MIN_ABI, fau_addr);
-  }).then(async ()=>{
+
     instanceT = await TuviellaToken.deployed(masterChef, fau_addr);
     vie_addr = instanceT.address;
     vie = new web3.eth.Contract(MIN_ABI, vie_addr);
