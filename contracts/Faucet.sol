@@ -11,14 +11,13 @@ contract Faucet is AccessControlEnumerable{
   mapping(address=>uint16) secs;
   mapping(address=>uint) amounts;
 
-  constructor() {
-    _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+  constructor(address admin) {
+    _setupRole(DEFAULT_ADMIN_ROLE, admin);
   }
   
   function setAdmin(address newAdmin) external onlyAdmin{
     _setupRole(DEFAULT_ADMIN_ROLE, newAdmin);
   }
-
   modifier onlyAdmin(){
     require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Mint: must have minter role to mint");
     _;
@@ -27,10 +26,21 @@ contract Faucet is AccessControlEnumerable{
     require(owner[token] == _msgSender());
     _;
   }
-
-  function receiveTokens(uint amount, address token) external{
+  modifier noOwner(address token){
     require(owner[token] == address(0));
+    _;
+  }
+
+  function _makeMeOwner(address token, uint amountForClaimers) internal noOwner(token) {
     owner[token] = msg.sender;
+    amounts[token] = amountForClaimers;
+  }
+  function makeMeOwner(address token, uint amountForClaimers) external {
+    _makeMeOwner(token, amountForClaimers);
+  }
+
+  function receiveTokens(address token, uint amount, uint amountForClaimers) external {
+    _makeMeOwner(token, amountForClaimers);
     IERC20(token).transfer(address(this), amount);
   }
 
