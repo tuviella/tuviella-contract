@@ -1,61 +1,53 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-interface IERC20 {
-    function balanceOf(address tokenOwner) external view returns (uint balance);
-    function transfer(address to, uint tokens) external returns (bool success);
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
-    event Transfer(address indexed from, address indexed to, uint tokens);
-}
+contract Faucet is AccessControlEnumerable{
 
-contract Faucet {
+  mapping(address=>mapping(address=>uint)) expiryOf;
+  mapping(address=>address) owner;
+  mapping(address=>uint16) secs;
+  mapping(address=>uint) amounts;
 
-  mapping(IERC20=>mapping(address=>uint)) expiryOf;
-  mapping(IERC20=>address) owner;
-  mapping(IERC20=>uint16) secs;
-  mapping(IERC20=>uint) amounts;
-
-  constructor() public {
-    adminFaucet = msg.sender;
+  constructor() {
+    _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
+  }
+  
+  function setAdmin(address newAdmin) external onlyAdmin{
+    _setupRole(DEFAULT_ADMIN_ROLE, newAdmin);
   }
 
   modifier onlyAdmin(){
-    require(msg.sender == adminFaucet);
+    require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Mint: must have minter role to mint");
     _;
   }
-  modifier onlyOwner(IERC20 token){
-    require(owner[token] == msg.sender);
+  modifier onlyOwner(address token){
+    require(owner[token] == _msgSender());
     _;
   }
 
-  function receiveTokens(uint amount, IERC20 token) external{
+  function receiveTokens(uint amount, address token) external{
     require(owner[token] == address(0));
     owner[token] = msg.sender;
-    token.transfer(address(this), amount);
+    IERC20(token).transfer(address(this), amount);
   }
 
-  function claimed(IERC20 token) external{
+  function claim(address token) external{
     require(expiryOf[token][msg.sender] < block.timestamp + secs[token]);
-    token.transfer(msg.sender, amounts[token]);
+    IERC20(token).transfer(msg.sender, amounts[token]);
     expiryOf[token][msg.sender] = block.timestamp + secs[token];
   }
 
-  function setSecs(uint16 _secs, IERC20 token) external onlyAdmin{
+  function setSecs(uint16 _secs, address token) external onlyAdmin{
     secs[token] = _secs;
   }
-  function setAmount(uint16 amount, IERC20 token) external onlyOwner(token){
+  function setAmount(uint16 amount, address token) external onlyOwner(token){
     amounts[token] = amount;
   }
 
-  function vaciarFaucet(IERC20 token) external onlyOwner(token){
-    token.transfer(msg.sender, token.balanceOf(address(this)));
-  }
-
-
-  //Para subir al contrato de admins
-  address adminFaucet;
-  
-  function setAdmin(address newAdmin) external onlyAdmin{
-    adminFaucet = newAdmin;
+  function vaciarFaucet(address token) external onlyOwner(token){
+    IERC20(token).transfer(msg.sender, IERC20(token).balanceOf(address(this)));
   }
 }
