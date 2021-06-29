@@ -17,7 +17,7 @@ contract TuviellaToken is ERC20, ERC20Burnable, ERC20Pausable, AccessControlEnum
    *
    * See {ERC20-constructor}.
    */
-  constructor(address masterChef, address faucet) public ERC20('Tuviella Token', 'TVT') TransactionFee() {
+  constructor(address masterChef, address faucet) ERC20('Tuviella Token', 'TVT') TransactionFee() {
     uint initial = 1000000 ether;
     _mint(masterChef, initial / 2);
     _mint(faucet, initial / 2);
@@ -79,7 +79,7 @@ contract TuviellaToken is ERC20, ERC20Burnable, ERC20Pausable, AccessControlEnum
    * - the caller must have the `PAUSER_ROLE`.
    */
   function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override(ERC20, ERC20Pausable) {
-    if (to != address(0)) {
+    if (to != address(0) && from != address(0)) {
       uint txFee = amount * getTransactionFee() / 10000;
       uint amountBurn = txFee * getBurnFee() / 10000;
       uint amountDevs = txFee * getDevsFee() / 10000;
