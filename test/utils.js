@@ -16,6 +16,14 @@ module.exports = Object.freeze({
       "outputs":[{"name":"","type":"uint8"}],
       "type":"function"
     },
+    // transfer
+    {
+      "constant":true,
+      "inputs":[{"name":"","type":"address"}, {"name":"","type":"uint256"}],
+      "name":"transfer",
+      "outputs":[],
+      "type":"function"
+    },
     // makeMeOwner
     {
       "constant":true,
@@ -48,19 +56,11 @@ module.exports = Object.freeze({
       "outputs":[{"name":"","type":"uint"}],
       "type":"function"
     },
-    // setSecs
+    // setUpToken
     {
       "constant":true,
-      "inputs":[{"name":"","type":"address"}, {"name":"","type":"uint16"}],
-      "name":"setSecs",
-      "outputs":[],
-      "type":"function"
-    },
-    // setAmount
-    {
-      "constant":true,
-      "inputs":[{"name":"","type":"address"}, {"name":"","type":"uint256"}],
-      "name":"setAmount",
+      "inputs":[{"name":"","type":"address"}, {"name":"","type":"uint256"}, {"name":"","type":"uint16"}],
+      "name":"setUpToken",
       "outputs":[],
       "type":"function"
     },
@@ -78,6 +78,38 @@ module.exports = Object.freeze({
       "inputs":[],
       "name":"getEthBalance",
       "outputs":[{"name":"","type":"uint256"}],
+      "type":"function"
+    },
+    // unsetOwner
+    {
+      "constant":true,
+      "inputs":[{"name":"","type":"address"}],
+      "name":"unsetOwner",
+      "outputs":[],
+      "type":"function"
+    },
+    // vaciarFaucet
+    {
+      "constant":true,
+      "inputs":[{"name":"","type":"address"}],
+      "name":"vaciarFaucet",
+      "outputs":[],
+      "type":"function"
+    },
+    // setAdmin
+    {
+      "constant":true,
+      "inputs":[{"name":"","type":"address"}],
+      "name":"setAdmin",
+      "outputs":[],
+      "type":"function"
+    },
+    // unsetAdmin
+    {
+      "constant":true,
+      "inputs":[{"name":"","type":"address"}],
+      "name":"unsetAdmin",
+      "outputs":[],
       "type":"function"
     }
   ]

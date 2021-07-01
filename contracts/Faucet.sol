@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract Faucet is AccessControlEnumerable{
 
+  
   mapping(address=>mapping(address=>uint)) expiryOf;
   mapping(address=>address) owner;
   mapping(address=>uint16) secs;
@@ -14,10 +15,7 @@ contract Faucet is AccessControlEnumerable{
   constructor(address admin) {
     _setupRole(DEFAULT_ADMIN_ROLE, admin);
   }
-  
-  function setAdmin(address newAdmin) external onlyAdmin{
-    _setupRole(DEFAULT_ADMIN_ROLE, newAdmin);
-  }
+
   modifier onlyAdmin(){
     require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "onlyAdmin function");
     _;
@@ -30,42 +28,36 @@ contract Faucet is AccessControlEnumerable{
     require(owner[token] == address(0), "noOwner function");
     _;
   }
+  
+  function setAdmin(address newAdmin) external onlyAdmin{
+    //TODO falta implementar
+    //_setupRole(DEFAULT_ADMIN_ROLE, admin);    me da out of gas
+  }
+  function unsetAdmin(address newAdmin) external onlyAdmin{
+    revokeRole(DEFAULT_ADMIN_ROLE, newAdmin);
+  }
+  function unsetOwner(address token) external {
+    require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()) || _msgSender() == owner[token], "Not admin nor owner");
+    owner[token] = address(0);
+  }
 
-  function _makeMeOwner(address token, uint amountForClaimers, uint16 _secs) internal noOwner(token) {
-    owner[token] = msg.sender;
+
+  function makeMeOwner(address token, uint amountForClaimers, uint16 _secs) external payable noOwner(token){
+    owner[token] = _msgSender();
     amounts[token] = amountForClaimers;
     secs[token] = _secs;
-  }
-  function makeMeOwner(address token, uint amountForClaimers, uint16 _secs) external payable{
-    _makeMeOwner(token, amountForClaimers, _secs);
-  }
-
-  function receiveTokens(address token, uint amount, uint amountForClaimers, uint16 _secs) external payable{
-    require(IERC20(token).approve(address(this), amount));
-
-    IERC20(token).transferFrom(msg.sender, address(this), amounts[token]);
-
-    _makeMeOwner(token, amountForClaimers, _secs);
   }
 
   function claim(address token) external{
     require(expiryOf[token][msg.sender] < block.timestamp + secs[token]);
 
     IERC20(token).transfer(msg.sender, amounts[token]);
-    
-    //IERC20(token).transfer(address(this), amounts[token]);
-    
-    //require(IERC20(token).approve(address(this), amounts[token]));
-    //IERC20(token).transferFrom(address(this), msg.sender, amounts[token]);
-    
 
     expiryOf[token][msg.sender] = block.timestamp + secs[token];
   }
 
-  function setSecs(address token, uint16 _secs) external onlyOwner(token){
+  function setUpToken(address token, uint _amount, uint16 _secs) external onlyOwner(token){
     secs[token] = _secs;
-  }
-  function setAmount(address token, uint _amount) external onlyOwner(token){
     amounts[token] = _amount;
   }
 
@@ -89,5 +81,4 @@ contract Faucet is AccessControlEnumerable{
   function getEthBalance() external view returns(uint){
     return address(this).balance;
   }
-  
 }
