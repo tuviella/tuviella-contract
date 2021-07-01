@@ -19,28 +19,29 @@ contract Faucet is AccessControlEnumerable{
     _setupRole(DEFAULT_ADMIN_ROLE, newAdmin);
   }
   modifier onlyAdmin(){
-    require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "Mint: must have minter role to mint");
+    require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "onlyAdmin function");
     _;
   }
   modifier onlyOwner(address token){
-    require(owner[token] == _msgSender());
+    require(owner[token] == _msgSender(), "onlyOwner function");
     _;
   }
   modifier noOwner(address token){
-    require(owner[token] == address(0));
+    require(owner[token] == address(0), "noOwner function");
     _;
   }
 
-  function _makeMeOwner(address token, uint amountForClaimers) internal noOwner(token) {
+  function _makeMeOwner(address token, uint amountForClaimers, uint16 _secs) internal noOwner(token) {
     owner[token] = msg.sender;
     amounts[token] = amountForClaimers;
+    secs[token] = _secs;
   }
-  function makeMeOwner(address token, uint amountForClaimers) external {
-    _makeMeOwner(token, amountForClaimers);
+  function makeMeOwner(address token, uint amountForClaimers, uint16 _secs) external payable{
+    _makeMeOwner(token, amountForClaimers, _secs);
   }
 
-  function receiveTokens(address token, uint amount, uint amountForClaimers) external {
-    _makeMeOwner(token, amountForClaimers);
+  function receiveTokens(address token, uint amount, uint amountForClaimers, uint16 _secs) external payable{
+    _makeMeOwner(token, amountForClaimers, _secs);
     IERC20(token).transfer(address(this), amount);
   }
 
@@ -50,14 +51,26 @@ contract Faucet is AccessControlEnumerable{
     expiryOf[token][msg.sender] = block.timestamp + secs[token];
   }
 
-  function setSecs(uint16 _secs, address token) external onlyAdmin{
+  function setSecs(address token, uint16 _secs) external onlyOwner(token){
     secs[token] = _secs;
   }
-  function setAmount(uint16 amount, address token) external onlyOwner(token){
-    amounts[token] = amount;
+  function setAmount(address token, uint _amount) external onlyOwner(token){
+    amounts[token] = _amount;
   }
 
   function vaciarFaucet(address token) external onlyOwner(token){
     IERC20(token).transfer(msg.sender, IERC20(token).balanceOf(address(this)));
   }
+
+  //getters que se pueden quitar
+  function getOwnerOf(address token) external view returns(address){
+    return owner[token];
+  }
+  function getAmountOf(address token) external view returns(uint){
+    return amounts[token];
+  }
+  function getSecsOf(address token) external view returns(uint16){
+    return secs[token];
+  }
+  
 }

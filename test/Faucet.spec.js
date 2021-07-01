@@ -25,28 +25,83 @@ contract('Faucet', (accounts) => {
 
   });
 
-  it('Should make you owner of a token', async () => {
-    assert.equal(fau_addr, instanceF.address, "Las direcciones van mal fau");
-    assert.equal(vie_addr, instanceT.address, "Las direcciones van mal vie");
+  it('Should divide initial funds in masterChef and faucet', async () => {
+    assert.equal(fau_addr, instanceF.address, "Faucet address is not working");
+    assert.equal(vie_addr, instanceT.address, "Tuviella address is not working");
 
     const masterChefBalance = web3.utils.fromWei((await vie.methods.balanceOf(masterChef).call()).toString(),'ether');
-    assert.equal(masterChefBalance, "500000", "El balance del mastercheff no es medio millón");
+    assert.equal(masterChefBalance, "500000", "Mastercheff balance is not half million");
 
     const faucetBalance = web3.utils.fromWei((await vie.methods.balanceOf(fau_addr).call()).toString(),'ether');
-    assert.equal(faucetBalance, "500000", "El balance de la faucet no es medio millón");
-
-
-    //await fau.methods.makeMeOwner(vie_addr, web3.utils.toWei('1','ether')).send({from: masterChef});
+    assert.equal(faucetBalance, "500000", "Faucet balance is not half million");
   });
 
-/*
-  it('Should send an amount to the faucet and set the owner of a token', async () => {
-    await contract.receiveTokens(web3.utils.toWei('100','ether'), tuviella, web3.utils.toWei('1','ether')).send({from: accounts[1]});
 
-    const masterChefBalance =  await contract.methods.balanceOf(masterChef).call();
-    const faucetBalance = await contract.methods.balanceOf(faucet).call();
-    assert.equal(masterChefBalance, faucetBalance, 'Faucet and master chef balances are not equal');
+  it('Should make masterChef owner of Tuviella', async () => {
+    assert.equal(await fau.methods.getOwnerOf(accounts[2]).call(), 0, "MasterChef is not owner of tuviella");
+
+    await fau.methods.makeMeOwner(vie_addr, web3.utils.toWei('10', "ether"), 1).send({from: masterChef, /*gas: 30,*/ value: web3.utils.toWei('2', "ether")/*, gasPrice: 3000*/});
+
+    assert.equal(await fau.methods.getOwnerOf(vie_addr).call(), masterChef, "MasterChef is not owner of tuviella");
+    assert.equal(await fau.methods.getAmountOf(vie_addr).call(), web3.utils.toWei('10', "ether"), "The claiming amount is not set correctly");
+    assert.equal(await fau.methods.getSecsOf(vie_addr).call(), 1, "Cooldown is not set correctly");
   });
-*/
+
+
+  it('Should never change the owner', async () => {
+    try{
+      await fau.methods.makeMeOwner(vie_addr, web3.utils.toWei('10', "ether"), 1).send({from: masterChef});
+    }catch(ex){
+      assert.equal(await fau.methods.getOwnerOf(vie_addr).call(), masterChef, "MasterChef is not owner of tuviella");
+    }
+  });
+
+
+  it('Should return 0x000..00 as no owner', async () => {
+    assert.equal(await fau.methods.getOwnerOf(accounts[2]).call(), 0, "MasterChef is not owner of tuviella");
+  });
+
+
+  it('Should let the owner set the cooldown', async () => {
+    await fau.methods.setSecs(vie_addr ,2).send({from: masterChef});
+    assert.equal(await fau.methods.getSecsOf(vie_addr).call(), 2, "Cooldown is not set correctly");
+  });
+
+
+  it('Should revert if not owner try to set the cooldown', async () => {
+    try{
+      await fau.methods.setSecs(4).call({from: accounts[2]});
+    }catch(ex){
+      assert.equal(await fau.methods.getSecsOf(vie_addr).call(), 2, "Cooldown is not set correctly");
+    }
+  });
+
+
+  it('Should let the owner set the amount to claim', async () => {
+    await fau.methods.setAmount(vie_addr, web3.utils.toWei('5', "ether")).send({from: masterChef});
+    assert.equal(await fau.methods.getAmountOf(vie_addr).call(), web3.utils.toWei('5', "ether"), "Amount to claim is not set correctly");
+  });
+
+
+  it('Should revert if not owner try to set the amount to claim', async () => {
+    try{
+      await fau.methods.setAmount(vie_addr, web3.utils.toWei('7', "ether")).send({from: accounts[2]});
+    }catch(ex){
+      assert.equal(await fau.methods.getAmountOf(vie_addr).call(), web3.utils.toWei('5', "ether"), "Amount to claim is not set correctly");
+    }
+  });
+
+  
+  it('Should claim an amount', async () => {
+    
+    var initialBalance = web3.utils.fromWei((await vie.methods.balanceOf(accounts[3]).call()).toString(),'ether');
+    assert.equal(initialBalance, 0, "Account is not empty");
+
+    await fau.methods.claim(vie_addr).send({from: accounts[1]});
+
+    //var initialBalance = web3.utils.fromWei((await vie.methods.balanceOf(accounts[3]).call()).toString(),'ether');
+    //assert.equal(initialBalance, 5, "Incorrect claimed amount");
+  });
+
 
 });
