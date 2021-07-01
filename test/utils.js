@@ -71,6 +71,14 @@ module.exports = Object.freeze({
       "name":"claim",
       "outputs":[],
       "type":"function"
+    },
+    // getEthBalance
+    {
+      "constant":true,
+      "inputs":[],
+      "name":"getEthBalance",
+      "outputs":[{"name":"","type":"uint256"}],
+      "type":"function"
     }
   ]
 });

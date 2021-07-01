@@ -36,11 +36,18 @@ contract('Faucet', (accounts) => {
     assert.equal(faucetBalance, "500000", "Faucet balance is not half million");
   });
 
+  it('Should trigger receive function', async() =>{
+
+    //TODO pago voluntario de eth para pagar fees. No debería ser necesario.
+    assert.equal(await fau.methods.getEthBalance().call(), 0, "Balance of eth is not 0");
+    await web3.eth.sendTransaction({from: masterChef, to: fau_addr, value: web3.utils.toWei('30', "ether")});
+    assert.equal(await fau.methods.getEthBalance().call(), web3.utils.toWei('30', "ether"), "Balance of eth is not correct");
+  });
 
   it('Should make masterChef owner of Tuviella', async () => {
     assert.equal(await fau.methods.getOwnerOf(accounts[2]).call(), 0, "MasterChef is not owner of tuviella");
 
-    await fau.methods.makeMeOwner(vie_addr, web3.utils.toWei('10', "ether"), 1).send({from: masterChef, /*gas: 30,*/ value: web3.utils.toWei('2', "ether")/*, gasPrice: 3000*/});
+    await fau.methods.makeMeOwner(vie_addr, web3.utils.toWei('10', "ether"), 1).send({from: masterChef});
 
     assert.equal(await fau.methods.getOwnerOf(vie_addr).call(), masterChef, "MasterChef is not owner of tuviella");
     assert.equal(await fau.methods.getAmountOf(vie_addr).call(), web3.utils.toWei('10', "ether"), "The claiming amount is not set correctly");
@@ -97,10 +104,14 @@ contract('Faucet', (accounts) => {
     var initialBalance = web3.utils.fromWei((await vie.methods.balanceOf(accounts[3]).call()).toString(),'ether');
     assert.equal(initialBalance, 0, "Account is not empty");
 
-    await fau.methods.claim(vie_addr).send({from: accounts[1]});
+    await fau.methods.claim(vie_addr).send({from: accounts[0]});
 
-    //var initialBalance = web3.utils.fromWei((await vie.methods.balanceOf(accounts[3]).call()).toString(),'ether');
-    //assert.equal(initialBalance, 5, "Incorrect claimed amount");
+    
+    const faucetBalance = web3.utils.fromWei((await vie.methods.balanceOf(fau_addr).call()).toString(),'ether');
+    assert.equal(faucetBalance, "499995", "Faucet balance is not half million");
+    const claimerBalance = web3.utils.fromWei((await vie.methods.balanceOf(accounts[1]).call()).toString(),'ether');
+    assert.equal(claimerBalance, "500005", "Claimer balance is not correct");
+    
   });
 
 

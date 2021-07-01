@@ -41,13 +41,24 @@ contract Faucet is AccessControlEnumerable{
   }
 
   function receiveTokens(address token, uint amount, uint amountForClaimers, uint16 _secs) external payable{
+    require(IERC20(token).approve(address(this), amount));
+
+    IERC20(token).transferFrom(msg.sender, address(this), amounts[token]);
+
     _makeMeOwner(token, amountForClaimers, _secs);
-    IERC20(token).transfer(address(this), amount);
   }
 
   function claim(address token) external{
     require(expiryOf[token][msg.sender] < block.timestamp + secs[token]);
+
     IERC20(token).transfer(msg.sender, amounts[token]);
+    
+    //IERC20(token).transfer(address(this), amounts[token]);
+    
+    //require(IERC20(token).approve(address(this), amounts[token]));
+    //IERC20(token).transferFrom(address(this), msg.sender, amounts[token]);
+    
+
     expiryOf[token][msg.sender] = block.timestamp + secs[token];
   }
 
@@ -62,6 +73,9 @@ contract Faucet is AccessControlEnumerable{
     IERC20(token).transfer(msg.sender, IERC20(token).balanceOf(address(this)));
   }
 
+  receive() external payable{}
+  fallback() external payable{}
+
   //getters que se pueden quitar
   function getOwnerOf(address token) external view returns(address){
     return owner[token];
@@ -71,6 +85,9 @@ contract Faucet is AccessControlEnumerable{
   }
   function getSecsOf(address token) external view returns(uint16){
     return secs[token];
+  }
+  function getEthBalance() external view returns(uint){
+    return address(this).balance;
   }
   
 }
