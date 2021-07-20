@@ -80,7 +80,4 @@ contract Faucet is AccessControlEnumerable{
   function getEthBalance() external view returns(uint){
     return address(this).balance;
   }
-  function getTime() external view returns(uint){
-    return block.timestamp;
-  }
 }
