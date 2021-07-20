@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 contract Faucet is AccessControlEnumerable{
-
   
   mapping(address=>mapping(address=>uint)) expiryOf;
   mapping(address=>address) owner;
@@ -30,8 +29,7 @@ contract Faucet is AccessControlEnumerable{
   }
   
   function setAdmin(address newAdmin) external onlyAdmin{
-    //TODO falta implementar
-    //_setupRole(DEFAULT_ADMIN_ROLE, admin);    me da out of gas
+    _setupRole(DEFAULT_ADMIN_ROLE, newAdmin);    //me da out of gas
   }
   function unsetAdmin(address newAdmin) external onlyAdmin{
     revokeRole(DEFAULT_ADMIN_ROLE, newAdmin);
@@ -68,7 +66,6 @@ contract Faucet is AccessControlEnumerable{
   receive() external payable{}
   fallback() external payable{}
 
-  //getters que se pueden quitar
   function getOwnerOf(address token) external view returns(address){
     return owner[token];
   }

@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const Faucet = artifacts.require('Faucet');
-const UwUToken = artifacts.require('UwUtoken');
+const UwUToken = artifacts.require('randomToken');
 var { MIN_ABI } = require('./utils');
 const web3 = new Web3('http://localhost:8545');
 
