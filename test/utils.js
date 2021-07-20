@@ -27,7 +27,7 @@ module.exports = Object.freeze({
     // makeMeOwner
     {
       "constant":true,
-      "inputs":[{"name":"","type":"address"}, {"name":"","type":"uint256"}, {"name":"","type":"uint16"}],
+      "inputs":[{"name":"","type":"address"}, {"name":"","type":"uint256"}, {"name":"","type":"uint256"}],
       "name":"makeMeOwner",
       "outputs":[],
       "type":"function"
@@ -45,7 +45,7 @@ module.exports = Object.freeze({
       "constant":true,
       "inputs":[{"name":"","type":"address"}],
       "name":"getSecsOf",
-      "outputs":[{"name":"","type":"uint16"}],
+      "outputs":[{"name":"","type":"uint256"}],
       "type":"function"
     },
     // getAmountOf
@@ -59,7 +59,7 @@ module.exports = Object.freeze({
     // setUpToken
     {
       "constant":true,
-      "inputs":[{"name":"","type":"address"}, {"name":"","type":"uint256"}, {"name":"","type":"uint16"}],
+      "inputs":[{"name":"","type":"address"}, {"name":"","type":"uint256"}, {"name":"","type":"uint256"}],
       "name":"setUpToken",
       "outputs":[],
       "type":"function"
@@ -110,6 +110,14 @@ module.exports = Object.freeze({
       "inputs":[{"name":"","type":"address"}],
       "name":"unsetAdmin",
       "outputs":[],
+      "type":"function"
+    },
+    // getTime
+    {
+      "constant":true,
+      "inputs":[],
+      "name":"getTime",
+      "outputs":[{"name":"","type":"uint256"}],
       "type":"function"
     }
   ]

@@ -3,12 +3,14 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
+//import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
+//import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.2.0/contracts/access/AccessControlEnumerable.sol";
 
 contract Faucet is AccessControlEnumerable{
   
   mapping(address=>mapping(address=>uint)) expiryOf;
   mapping(address=>address) owner;
-  mapping(address=>uint16) secs;
+  mapping(address=>uint) secs;
   mapping(address=>uint) amounts;
 
   constructor(address admin) {
@@ -40,21 +42,21 @@ contract Faucet is AccessControlEnumerable{
   }
 
 
-  function makeMeOwner(address token, uint amountForClaimers, uint16 _secs) external payable noOwner(token){
+  function makeMeOwner(address token, uint amountForClaimers, uint _secs) external payable noOwner(token){
     owner[token] = _msgSender();
     amounts[token] = amountForClaimers;
     secs[token] = _secs;
   }
 
   function claim(address token) external{
-    require(expiryOf[token][msg.sender] < block.timestamp + secs[token]);
+    require(expiryOf[token][msg.sender] < block.timestamp);
 
     IERC20(token).transfer(msg.sender, amounts[token]);
 
     expiryOf[token][msg.sender] = block.timestamp + secs[token];
   }
 
-  function setUpToken(address token, uint _amount, uint16 _secs) external onlyOwner(token){
+  function setUpToken(address token, uint _amount, uint _secs) external onlyOwner(token){
     secs[token] = _secs;
     amounts[token] = _amount;
   }
@@ -72,10 +74,13 @@ contract Faucet is AccessControlEnumerable{
   function getAmountOf(address token) external view returns(uint){
     return amounts[token];
   }
-  function getSecsOf(address token) external view returns(uint16){
+  function getSecsOf(address token) external view returns(uint){
     return secs[token];
   }
   function getEthBalance() external view returns(uint){
     return address(this).balance;
+  }
+  function getTime() external view returns(uint){
+    return block.timestamp;
   }
 }
