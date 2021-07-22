@@ -1,10 +1,10 @@
 const Faucet = artifacts.require("Faucet");
 const TuviellaToken = artifacts.require('TuviellaToken');
 
-module.exports = function (deployer, network, accounts) {
-  deployer.deploy(Faucet, accounts[1], TuviellaToken.address);
-  //deployer.deploy(Faucet, '0xC1f60612b749b7DC89Eb99d5b18EaF56EB438fFC', TuviellaToken.address);
+module.exports = async function (deployer, network, accounts) {
+  //deployer.deploy(Faucet, accounts[1], TuviellaToken.address);
+  deployer.deploy(TuviellaToken, '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B', '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B');
+  deployer.deploy(Faucet, '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B', "0xA126412AD78D70E23f2b00e778dB4B1cBC0a0150");
 
-  deployer.deploy(TuviellaToken, accounts[0], Faucet.address);
-  //deployer.deploy(TuviellaToken, '0xC1f60612b749b7DC89Eb99d5b18EaF56EB438fFC', Faucet.address);
+  //deployer.deploy(TuviellaToken, accounts[0], Faucet.address);
 };
