@@ -3,8 +3,6 @@ pragma solidity >=0.4.22 <0.9.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
-//import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol";
-//import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.2.0/contracts/access/AccessControlEnumerable.sol";
 
 contract Faucet is AccessControlEnumerable{
   
@@ -13,8 +11,11 @@ contract Faucet is AccessControlEnumerable{
   mapping(address=>uint) secs;
   mapping(address=>uint) amounts;
 
-  constructor(address admin) {
+  constructor(address admin, address viellas) {
     _setupRole(DEFAULT_ADMIN_ROLE, admin);
+    owner[viellas] = admin;
+    secs[viellas] = 600;
+    amounts[viellas] = 1 ether; 
   }
 
   modifier onlyAdmin(){

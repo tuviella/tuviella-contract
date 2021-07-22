@@ -4,7 +4,7 @@ const TuviellaToken = artifacts.require('TuviellaToken');
 const web3 = new Web3('http://localhost:8545');
 
 contract('TuviellaToken', (accounts) => {
-  const masterChef = accounts[0];
+  const masterChef = accounts[1];
   let faucet;
   let FInstance;
   let instance;

@@ -42,14 +42,18 @@ module.exports = {
     // tab if you use this network and you must also set the `host`, `port` and `network_id`
     // options below to some value.
     //
+
+
+    
     development: {
       host: '127.0.0.1',     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: '333'       // Any network (default: none)
     },
+     //*/
     // Another network with more advanced options...
 
-/* 
+/*
     advanced: {
       provider: () => new HDWalletProvider(mnemonic, 'https://rpc-mumbai.maticvigil.com/'),
       //port: 8545,             // Custom port
@@ -58,7 +62,7 @@ module.exports = {
       gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
       from: '0xC1f60612b749b7DC89Eb99d5b18EaF56EB438fFC',        // Account to send txs from (default: accounts[0])
       websocket: true        // Enable EventEmitter interface for web3 (default: false)
-    }, */
+    }, //*/
 
 
     // Useful for deploying to a public network.
