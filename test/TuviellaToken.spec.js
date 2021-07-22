@@ -1,7 +1,6 @@
 const Web3 = require('web3');
 const Faucet = artifacts.require('Faucet');
 const TuviellaToken = artifacts.require('TuviellaToken');
-var { MIN_ABI } = require('./utils');
 const web3 = new Web3('http://localhost:8545');
 
 contract('TuviellaToken', (accounts) => {
@@ -18,7 +17,7 @@ contract('TuviellaToken', (accounts) => {
 
     instance = await TuviellaToken.deployed(masterChef, faucet);
     contractAddress = instance.address;
-    contract = new web3.eth.Contract(MIN_ABI, contractAddress);
+    contract = new web3.eth.Contract(instance.abi, contractAddress);
   });
 
   it('Should divide initial funds in masterChef and faucet', async () => {

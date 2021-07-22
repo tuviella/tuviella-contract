@@ -1,8 +1,9 @@
 const Web3 = require('web3');
 const Faucet = artifacts.require('Faucet');
 const UwUToken = artifacts.require('randomToken');
-var { MIN_ABI } = require('./utils');
+
 const web3 = new Web3('http://localhost:8545');
+
 
 contract('Faucet', (accounts) => {
   const owner = accounts[0];
@@ -18,11 +19,11 @@ contract('Faucet', (accounts) => {
   before(async () => {
     instanceF = await Faucet.deployed(admin);
     fau_addr = instanceF.address;
-    fau = new web3.eth.Contract(MIN_ABI, fau_addr);
+    fau = new web3.eth.Contract(instanceF.abi, fau_addr);
 
     instanceT = await UwUToken.deployed(admin, fau_addr);
     uwu_addr = instanceT.address;
-    uwu = new web3.eth.Contract(MIN_ABI, uwu_addr);
+    uwu = new web3.eth.Contract(instanceT.abi, uwu_addr);
 
   });
 
