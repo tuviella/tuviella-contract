@@ -50,11 +50,11 @@ contract Faucet is AccessControlEnumerable{
   }
 
   function claim(address token) external{
-    require(expiryOf[token][msg.sender] < block.timestamp);
+    require(expiryOf[token][_msgSender()] < block.timestamp);
 
-    IERC20(token).transfer(msg.sender, amounts[token]);
+    IERC20(token).transfer(_msgSender(), amounts[token]);
 
-    expiryOf[token][msg.sender] = block.timestamp + secs[token];
+    expiryOf[token][_msgSender()] = block.timestamp + secs[token];
   }
 
   function setUpToken(address token, uint _amount, uint _secs) external onlyOwner(token){
@@ -63,14 +63,18 @@ contract Faucet is AccessControlEnumerable{
   }
 
   function vaciarFaucet(address token) external onlyOwner(token){
-    IERC20(token).transfer(msg.sender, IERC20(token).balanceOf(address(this)));
+    IERC20(token).transfer(_msgSender(), IERC20(token).balanceOf(address(this)));
   }
 
   receive() external payable{}
   fallback() external payable{}
+  function getEther() external onlyAdmin{
+    require(payable(_msgSender()).send(address(this).balance),  "Failed to send ether");
+  }
+  
 
   function getExpiryOf(address token) external view returns(uint){
-    return expiryOf[token][msg.sender];
+    return expiryOf[token][_msgSender()];
   }
 
   function getOwnerOf(address token) external view returns(address){

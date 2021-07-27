@@ -32,6 +32,8 @@ contract('Faucet', (accounts) => {
     assert.equal(await fau.methods.getEthBalance().call(), 0, "eth balance is not 0");
     await web3.eth.sendTransaction({from: owner, to: fau_addr, value: web3.utils.toWei('30', "ether")});
     assert.equal(await fau.methods.getEthBalance().call(), web3.utils.toWei('30', "ether"), "Balance of eth is not correct");
+    await fau.methods.getEther().send({from: admin});
+    assert.equal(await fau.methods.getEthBalance().call(), web3.utils.toWei('0', "ether"), "Balance of eth is not 0 after getEther");
   });
 
   it('Should send tokens to the faucet', async() =>{
