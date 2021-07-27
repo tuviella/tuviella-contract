@@ -21,8 +21,10 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const infuraKey = "fj4jll3k.....";
 
+// .secret public address: 0xC1f60612b749b7DC89Eb99d5b18EaF56EB438fFC
+// .secret2 public address: 0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B
 const fs = require('fs');
-const mnemonic = fs.readFileSync(".secret").toString().trim();
+const mnemonic = fs.readFileSync(".secret2").toString().trim();
 
 module.exports = {
   /**
@@ -45,15 +47,18 @@ module.exports = {
 
 
     
-    /*development: {
+    /*
+    development: {
       host: '127.0.0.1',     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: '333'       // Any network (default: none)
     },
      //*/
+
+     
+
+    
     // Another network with more advanced options...
-
-
     advanced: {
       provider: () => new HDWalletProvider(mnemonic, 'https://speedy-nodes-nyc.moralis.io/064676ac5e25719172f1c608/eth/ropsten/'),
       //port: 8545,             // Custom port
@@ -63,6 +68,9 @@ module.exports = {
       from: '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B',        // Account to send txs from (default: accounts[0])
       websocket: true        // Enable EventEmitter interface for web3 (default: false)
     }, //*/
+
+
+
 
 
     // Useful for deploying to a public network.
