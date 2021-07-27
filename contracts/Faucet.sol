@@ -69,6 +69,10 @@ contract Faucet is AccessControlEnumerable{
   receive() external payable{}
   fallback() external payable{}
 
+  function getExpiryOf(address token) external view returns(uint){
+    return expiryOf[token][msg.sender];
+  }
+
   function getOwnerOf(address token) external view returns(address){
     return owner[token];
   }
