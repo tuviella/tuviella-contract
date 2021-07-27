@@ -47,7 +47,7 @@ module.exports = {
 
 
     
-    /*
+    
     development: {
       host: '127.0.0.1',     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
@@ -57,7 +57,7 @@ module.exports = {
 
      
 
-    
+    /*
     // Another network with more advanced options...
     advanced: {
       provider: () => new HDWalletProvider(mnemonic, 'https://speedy-nodes-nyc.moralis.io/064676ac5e25719172f1c608/eth/ropsten/'),
