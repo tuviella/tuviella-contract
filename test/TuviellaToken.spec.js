@@ -1,28 +1,34 @@
 const Web3 = require('web3');
-const Faucet = artifacts.require('Faucet');
 const TuviellaToken = artifacts.require('TuviellaToken');
 const web3 = new Web3('http://localhost:8545');
 
 contract('TuviellaToken', (accounts) => {
-  const masterChef = accounts[1];
-  let faucet;
-  let FInstance;
+  const masterChef = accounts[0];
   let instance;
   let contractAddress;
   let contract;
 
   before(async () => {
-    FInstance = await Faucet.deployed(masterChef);
-    faucet = FInstance.address;
-
-    instance = await TuviellaToken.deployed(masterChef, faucet);
+    instance = await TuviellaToken.deployed(masterChef);
     contractAddress = instance.address;
     contract = new web3.eth.Contract(instance.abi, contractAddress);
   });
 
-  it('Should divide initial funds in masterChef and faucet', async () => {
-    const masterChefBalance =   await contract.methods.balanceOf(masterChef).call();
-    const faucetBalance = await contract.methods.balanceOf(faucet).call();
-    assert.equal(masterChefBalance, faucetBalance, 'Faucet and master chef balances are not equal');
+  it('Should mint initial funds to masterChef', async () => {
+    const masterChefBalance = await contract.methods.balanceOf(masterChef).call();
+    assert.equal(masterChefBalance, web3.utils.toWei('1000000', 'ether'), 'Masterchef balance is not correct');
+  });
+
+  
+  it('Should substract txFee to amount sent', async () => {
+    const masterChefBalance = web3.utils.fromWei((await contract.methods.balanceOf(masterChef).call()).toString(), 'ether') - 10 + 0.0175;
+
+    await contract.methods.transfer(accounts[1], web3.utils.toWei('10', 'ether')).send({from:masterChef});
+
+    assert.equal(masterChefBalance, web3.utils.fromWei((await contract.methods.balanceOf(masterChef).call()).toString(), 'ether') , 'incorrect fee charge');
+    assert.equal(web3.utils.fromWei((await contract.methods.balanceOf(accounts[1]).call()).toString(), 'ether'), 10 - 0.07, "Incorrect fee charge");
+
+    await contract.methods.transfer(accounts[2], web3.utils.toWei('5', 'ether')).send({from:accounts[1]});
+    assert.equal(masterChefBalance + 0.00875, web3.utils.fromWei((await contract.methods.balanceOf(masterChef).call()).toString(), 'ether'), "incorrect random Holder");
   });
 });

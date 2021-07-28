@@ -24,7 +24,7 @@ const infuraKey = "fj4jll3k.....";
 // .secret public address: 0xC1f60612b749b7DC89Eb99d5b18EaF56EB438fFC
 // .secret2 public address: 0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B
 const fs = require('fs');
-const mnemonic = fs.readFileSync(".secret2").toString().trim();
+const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 module.exports = {
   /**
