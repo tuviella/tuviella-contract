@@ -31,4 +31,12 @@ contract('TuviellaToken', (accounts) => {
     await contract.methods.transfer(accounts[2], web3.utils.toWei('5', 'ether')).send({from:accounts[1]});
     assert.equal(masterChefBalance + 0.00875, web3.utils.fromWei((await contract.methods.balanceOf(masterChef).call()).toString(), 'ether'), "incorrect random Holder");
   });
+
+  it('Should let send all tuviellas', async () => {
+    const masterChefBalance = await contract.methods.balanceOf(masterChef).call();
+
+    await contract.methods.transfer(accounts[1], masterChefBalance).send({from:masterChef});
+
+    assert.equal(await contract.methods.balanceOf(masterChef).call(), 0, "Balance should be 0");
+  });
 });
