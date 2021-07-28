@@ -1,3 +1,7 @@
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const Web3 = require('web3');
 const Faucet = artifacts.require('Faucet');
 const UwUToken = artifacts.require('randomToken');
@@ -141,8 +145,6 @@ contract('Faucet', (accounts) => {
   });
 
   it('Should NOT let an user claim twice', async () => {
-
-    
     var initialBalance = web3.utils.fromWei((await uwu.methods.balanceOf(accounts[3]).call()).toString(),'ether');
     assert.equal(initialBalance, 0, "Account is not empty");
 
@@ -153,9 +155,29 @@ contract('Faucet', (accounts) => {
       const claimerBalance = web3.utils.fromWei((await uwu.methods.balanceOf(accounts[3]).call()).toString(),'ether');
       assert.equal(claimerBalance, 5, "Claimer balance is not correct");
     }
-
-
   });
+
+  it('Should return expiryOf a user', async () => {
+    
+    
+    var num = await fau.methods.getExpiryOf(accounts[3], uwu_addr).call({from: accounts[3]});
+    try{
+      assert.equal(10, num);
+    }catch(ex){
+      assert.equal(9, num, "ExpiryOf should be 9 or 10");
+    }
+
+    await sleep(11000);
+    await web3.eth.sendTransaction({from: accounts[7], to: accounts[8], value: web3.utils.toWei('30', "ether")});
+    await web3.eth.sendTransaction({from: accounts[8], to: accounts[7], value: web3.utils.toWei('30', "ether")});
+
+    num = await fau.methods.getExpiryOf(accounts[3], uwu_addr).call({from: accounts[3]});
+
+    assert.equal(0, num, "ExpiryOf should be 0");
+  });
+
+
+
   
   it('Should unset admin', async()=>{
     await fau.methods.unsetAdmin(admin).send({from: admin});

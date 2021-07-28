@@ -73,8 +73,9 @@ contract Faucet is AccessControlEnumerable{
   }
   
 
-  function getExpiryOf(address token) external view returns(uint){
-    return expiryOf[token][_msgSender()];
+  function getExpiryOf(address user, address token) external view returns(uint){
+    uint nowTime = block.timestamp;
+    return  expiryOf[token][user] > nowTime ? expiryOf[token][user] - nowTime : 0 ;
   }
 
   function getOwnerOf(address token) external view returns(address){

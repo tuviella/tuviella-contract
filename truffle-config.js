@@ -47,28 +47,31 @@ module.exports = {
 
 
     
-    /*
+    
     development: {
       host: '127.0.0.1',     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: '333'       // Any network (default: none)
     },
-     //*/
-
-     
-
     
     // Another network with more advanced options...
-    advanced: {
+    ropsten: {
       provider: () => new HDWalletProvider(mnemonic, 'https://speedy-nodes-nyc.moralis.io/064676ac5e25719172f1c608/eth/ropsten/'),
       //port: 8545,             // Custom port
       network_id: 3,       // Custom network
       gas: 5000000,            // Gas sent with each transaction (default: ~6700000)
       gasPrice: 5000000000,  // 20 gwei (in wei) (default: 100 gwei)
-      from: '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B',        // Account to send txs from (default: accounts[0])
+      from: '0xC1f60612b749b7DC89Eb99d5b18EaF56EB438fFC',        // Account to send txs from (default: accounts[0])
       websocket: true        // Enable EventEmitter interface for web3 (default: false)
-    }, //*/
+    },
 
+    bsc_testnet: {
+      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      network_id: 97,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
 
 
 
