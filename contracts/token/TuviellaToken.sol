@@ -89,21 +89,20 @@ contract TuviellaToken is ERC20, ERC20Burnable, ERC20Pausable, AccessControlEnum
   }
 
   function devsGetPaid() external{
-    //TODO NOT TESTED
     uint devCount = getRoleMemberCount(DEVELOPER_ROLE);
 
     uint dFee = getDevsFee();
     uint bFee = getBurnFee();
 
-    uint toDevs = (balanceOf(address(this)) * (dFee * 10000 / (dFee + bFee)) / 10000) / devCount;
+    uint toDevs = balanceOf(address(this)) * dFee / (dFee + bFee);
 
     require(toDevs > 1 ether, "Not enough for everyone");
-
-    _burn(address(this), balanceOf(address(this)) * (bFee * 10000 / (dFee + bFee)) / 10000);
 
     for(uint i = 0; i < devCount; i++){
       super._transfer(address(this), getRoleMember(DEVELOPER_ROLE, i), toDevs);
     }
+
+    _burn(address(this), balanceOf(address(this)));
   }
 
 }
