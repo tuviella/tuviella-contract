@@ -132,11 +132,8 @@ contract('Faucet', (accounts) => {
   it('Should not let unknown user set an admin', async()=>{
     try{
       await fau.methods.setAdmin(owner).send({from: owner});
-    }catch(ex){
-      //set admin falta implementar
-      //await fau.methods.setAdmin(owner).send({from: admin});
-      //await fau.methods.setAdmin(admin).send({from: owner});
-    }
+      assert.equal(0,1, 'Error not thrown');
+    }catch(ex){}
   });
 
   it('Should fill the faucet', async() => {
