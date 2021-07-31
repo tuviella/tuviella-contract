@@ -91,12 +91,4 @@ abstract contract TransactionFee is ERC20, AccessControlEnumerable {
   function removeDev(address _wallet) external {
     revokeRole(DEVELOPER_ROLE, _wallet);
   }
-
-  function _transferToDevs(address from, uint256 amountDevs) internal {
-
-  }
-
-  function _transferToHolder(address from, uint256 amountHolder) internal {
-
-  }
 }

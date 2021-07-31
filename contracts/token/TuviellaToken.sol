@@ -11,20 +11,23 @@ contract TuviellaToken is ERC20, ERC20Burnable, ERC20Pausable, AccessControlEnum
   bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
   bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
 
+  address public lastTransfer;
+
   /**
    * @dev Grants `DEFAULT_ADMIN_ROLE`, `MINTER_ROLE` and `PAUSER_ROLE` to the
    * account that deploys the contract and mint 1million tokens to master chef address
    *
    * See {ERC20-constructor}.
    */
-  constructor(address masterChef, address faucet) ERC20('Tuviella Token', 'TVT') TransactionFee() {
+  constructor(address masterChef) ERC20('Tuviella Token', 'TVT') TransactionFee() {
     uint initial = 1000000 ether;
-    _mint(masterChef, initial / 2);
-    _mint(faucet, initial / 2);
+    _mint(masterChef, initial);
     _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
 
     _setupRole(MINTER_ROLE, _msgSender());
     _setupRole(PAUSER_ROLE, _msgSender());
+
+    lastTransfer = _msgSender();
   }
 
   /**
@@ -69,27 +72,37 @@ contract TuviellaToken is ERC20, ERC20Burnable, ERC20Pausable, AccessControlEnum
     _unpause();
   }
 
-  /**
-   * @dev Unpauses all token transfers.
-   *
-   * See {ERC20Pausable} and {Pausable-_unpause}.
-   *
-   * Requirements:
-   *
-   * - the caller must have the `PAUSER_ROLE`.
-   */
-  function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override(ERC20, ERC20Pausable) {
-    if (to != address(0) && from != address(0)) {
-      uint txFee = amount * getTransactionFee() / 10000;
-      uint amountBurn = txFee * getBurnFee() / 10000;
-      uint amountDevs = txFee * getDevsFee() / 10000;
-      uint amountHolder = txFee * getHolderFee() / 10000;
-      _burn(from, amountBurn);
-      _transferToDevs(from, amountDevs);
-      _transferToHolder(from, amountHolder);
-      amount -= txFee;
-      super._beforeTokenTransfer(from, to, amount);
+  function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override(ERC20, ERC20Pausable){ }
+
+  function _transfer(address sender, address recipient, uint256 amount) internal virtual override(ERC20){
+    uint txFee = amount * getTransactionFee() / 10000;
+    uint amountBurn = txFee * getBurnFee() / 10000;
+    uint amountDevs = txFee * getDevsFee() / 10000;
+    uint amountHolder = txFee * getHolderFee() / 10000;
+    
+    super._transfer(sender, address(this), amountBurn + amountDevs);
+    super._transfer(sender, lastTransfer, amountHolder);
+    lastTransfer = sender;
+  
+    amount -= txFee;
+    super._transfer(sender, recipient, amount);
+  }
+
+  function devsGetPaid() external{
+    uint devCount = getRoleMemberCount(DEVELOPER_ROLE);
+
+    uint dFee = getDevsFee();
+    uint bFee = getBurnFee();
+
+    uint toDevs = balanceOf(address(this)) * dFee / (dFee + bFee);
+
+    require(toDevs > 1 ether, "Not enough for everyone");
+
+    for(uint i = 0; i < devCount; i++){
+      super._transfer(address(this), getRoleMember(DEVELOPER_ROLE, i), toDevs);
     }
+
+    _burn(address(this), balanceOf(address(this)));
   }
 
 }

@@ -18,11 +18,13 @@
  *
  */
 
-// const HDWalletProvider = require('@truffle/hdwallet-provider');
-// const infuraKey = "fj4jll3k.....";
-//
-// const fs = require('fs');
-// const mnemonic = fs.readFileSync(".secret").toString().trim();
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const infuraKey = "fj4jll3k.....";
+
+// .secret public address: 0xC1f60612b749b7DC89Eb99d5b18EaF56EB438fFC
+// .secret2 public address: 0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B
+const fs = require('fs');
+const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 module.exports = {
   /**
@@ -42,20 +44,38 @@ module.exports = {
     // tab if you use this network and you must also set the `host`, `port` and `network_id`
     // options below to some value.
     //
+
+
+    
+    
     development: {
       host: '127.0.0.1',     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: '333'       // Any network (default: none)
-    }
+    },
+    
     // Another network with more advanced options...
-    // advanced: {
-    // port: 8777,             // Custom port
-    // network_id: 1342,       // Custom network
-    // gas: 8500000,           // Gas sent with each transaction (default: ~6700000)
-    // gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
-    // from: <address>,        // Account to send txs from (default: accounts[0])
-    // websocket: true        // Enable EventEmitter interface for web3 (default: false)
-    // },
+    ropsten: {
+      provider: () => new HDWalletProvider(mnemonic, 'https://speedy-nodes-nyc.moralis.io/064676ac5e25719172f1c608/eth/ropsten/'),
+      //port: 8545,             // Custom port
+      network_id: 3,       // Custom network
+      gas: 5000000,            // Gas sent with each transaction (default: ~6700000)
+      gasPrice: 5000000000,  // 20 gwei (in wei) (default: 100 gwei)
+      from: '0xC1f60612b749b7DC89Eb99d5b18EaF56EB438fFC',        // Account to send txs from (default: accounts[0])
+      websocket: true        // Enable EventEmitter interface for web3 (default: false)
+    },
+
+    bsc_testnet: {
+      provider: () => new HDWalletProvider(mnemonic, `https://data-seed-prebsc-1-s1.binance.org:8545`),
+      network_id: 97,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+
+
+
+
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     // ropsten: {
