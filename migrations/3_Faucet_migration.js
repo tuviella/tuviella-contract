@@ -3,7 +3,10 @@ const TuviellaToken = artifacts.require('TuviellaToken');
 
 module.exports = async function (deployer, network, accounts) {
   
-  //deployer.deploy(Faucet, '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B', TuviellaToken.address);
+  if(network === 'development'){
+    await deployer.deploy(Faucet, accounts[1], TuviellaToken.address);
 
-  deployer.deploy(Faucet, accounts[1], TuviellaToken.address);
+  }else{
+    await deployer.deploy(Faucet, '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B', TuviellaToken.address);
+  }
 };

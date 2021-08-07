@@ -13,6 +13,8 @@ contract TuviellaToken is ERC20, ERC20Burnable, ERC20Pausable, AccessControlEnum
 
   address public lastTransfer;
 
+  bool stakintMinterSetted;
+
   /**
    * @dev Grants `DEFAULT_ADMIN_ROLE`, `MINTER_ROLE` and `PAUSER_ROLE` to the
    * account that deploys the contract and mint 1million tokens to master chef address
@@ -20,14 +22,25 @@ contract TuviellaToken is ERC20, ERC20Burnable, ERC20Pausable, AccessControlEnum
    * See {ERC20-constructor}.
    */
   constructor(address masterChef) ERC20('Tuviella Token', 'TVT') TransactionFee() {
-    uint initial = 1000000 ether;
+    uint initial = 400000 ether;
     _mint(masterChef, initial);
     _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
 
     _setupRole(MINTER_ROLE, _msgSender());
     _setupRole(PAUSER_ROLE, _msgSender());
 
+    stakintMinterSetted = false;
+
     lastTransfer = _msgSender();
+  }
+
+  function setStakingMinter(address staking) external{
+    require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "not admin!");
+    require(!stakintMinterSetted, "This function won't be called.");
+
+    _setupRole(MINTER_ROLE, staking);
+
+    stakintMinterSetted = true;
   }
 
   /**

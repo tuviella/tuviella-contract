@@ -24,7 +24,7 @@ contract('TuviellaToken', (accounts) => {
 
   it('Should mint initial funds to masterChef', async () => {
     const masterChefBalance = await contract.methods.balanceOf(masterChef).call();
-    assert.equal(masterChefBalance, toWei(1000000), 'Masterchef balance is not correct');
+    assert.equal(masterChefBalance, toWei(400000), 'Masterchef balance is not correct');
   });
 
   
@@ -50,7 +50,7 @@ contract('TuviellaToken', (accounts) => {
 
   it('Should pay to devs and burn', async () => {
 
-    var bal = 5250026387812500000000;
+    var bal = 2100026387812500000000;
     const txFee = toWei(100) * 70 / 10000;
     const amountBurn = txFee * 5000 / 10000;
     const amountDevs = txFee * 2500 / 10000;
@@ -62,7 +62,7 @@ contract('TuviellaToken', (accounts) => {
     var masterChefBalance = (lastTxHolderFee + received);
     masterChefBalance = Math.round(masterChefBalance / 10**8) * 10**8;
 
-    assert.equal(await contract.methods.balanceOf(contractAddress).call(), 5250026387812500000000, "Balance should not be 0");
+    assert.equal(await contract.methods.balanceOf(contractAddress).call(), 2100026387812500000000, "Balance should not be 0");
 
     assert.equal(await contract.methods.balanceOf(masterChef).call(), 0, "Incorrect masterchef balance");
     await contract.methods.transfer(accounts[2], toWei(100)).send({from: accounts[1]});

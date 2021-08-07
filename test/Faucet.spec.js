@@ -25,7 +25,7 @@ contract('Faucet', (accounts) => {
     fau_addr = instanceF.address;
     fau = new web3.eth.Contract(instanceF.abi, fau_addr);
 
-    instanceT = await UwUToken.deployed(admin, fau_addr);
+    instanceT = await UwUToken.deployed(admin);
     uwu_addr = instanceT.address;
     uwu = new web3.eth.Contract(instanceT.abi, uwu_addr);
 
