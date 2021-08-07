@@ -4,6 +4,9 @@ function toWei(num){
 function fromWei(num){
   return web3.utils.fromWei(num.toString(), 'ether');
 }
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 const Web3 = require('web3');
 const Staking = artifacts.require('Staking');
@@ -81,24 +84,72 @@ contract('Staking', (accounts) => {
     assert.equal(viellasBalance < await viellas.methods.balanceOf(stk_addr).call(), true, "Viellas not received by staking")
   });
 
-  it('Should', async () => {
+  it('Should show pending viellas', async () => {
+    await stk.methods.massUpdatePools().send({from: masterChef, gasLimit: 1000000});
+    var pending = await stk.methods.pendingViellas(1, masterChef).call();
+    assert.equal(pending, 0, "There's pendng viellas")
   });
   
+  it('Should calculate rewards comparing devs rewards and staking rewards', async () => {
+    await stk.methods.massUpdatePools().send({from: masterChef, gasLimit: 1000000});
+    await sleep(8000);
+
+    const devsTotalReward = parseInt((await viellas.methods.balanceOf(viellas_addr).call()).toString());
+    //assert.equal(num_prueba, devsTotalReward, "Incorrect devs total reward");
+
+    const poolsReward = await viellas.methods.balanceOf(stk_addr).call();
+    
+    const condition = devsTotalReward < Math.floor(poolsReward / 10) + 10 && devsTotalReward > Math.floor(poolsReward / 10) - 10;
+
+    assert.equal(condition, true, "devs: " + devsTotalReward + ", pools: " + Math.floor(poolsReward / 10) + ". Not equal");
+  });
+  
+
+
+
+
+
+
+  it('Only devSetter should change dev address', async () => {
+    try{
+      await stk.methods.dev(accounts[1]).send({from: accounts[1]});
+      assert.equal(0,1, "Not dev has changed dev address")
+    }catch(ex){}
+    
+    var viellasBal = await viellas.methods.balanceOf(accounts[1]).call();
+
+    await stk.methods.dev(accounts[1]).send({from: masterChef});
+    assert.equal(accounts[1], await stk.methods.devaddr().call(), "Accounts[1] is not dev addres");
+    
+    await sleep(1000);
+
+    await stk.methods.updatePool(1).send({from: masterChef, gasLimit: 1000000});
+
+    assert.equal(viellasBal < await viellas.methods.balanceOf(accounts[1]).call(), true, "Viellas not minted to dev");
+
+    try{
+      await stk.methods.dev(viellas_addr).send({from: masterChef});
+      assert.equal(0,1, "Not dev has changed dev address")
+    }catch(ex){}
+    assert.equal(viellas_addr, await stk.methods.devaddr().call(), "TuViellaToken is not dev addres");
+
+  });
+
 
   /*
 
   function updateMultiplier(uint256 multiplierNumber) public onlyOwner{}
-  function poolLength() external view returns (uint256) {}
-  function add(uint256 _allocPoint, IERC20 _stakedToken, bool _withUpdate) public onlyOwner {}
+  //function poolLength() external view returns (uint256) {}
+  //function add(uint256 _allocPoint, IERC20 _stakedToken, bool _withUpdate) public onlyOwner {}
   function set(uint256 _pid, uint256 _allocPoint, bool _withUpdate) public onlyOwner {}
   function getMultiplier(uint256 _from, uint256 _to) public view returns (uint256) {}
-  function pendingViellas(uint256 _pid, address _user) external view returns (uint256) {}
-  function massUpdatePools() public {}
-  function updatePool(uint256 _pid) public {}
-  function deposit(uint256 _pid, uint256 _amount) public {}
-  function withdraw(uint256 _pid, uint256 _amount) public {}
+  //function pendingViellas(uint256 _pid, address _user) external view returns (uint256) {}
+  //function massUpdatePools() public {}
+  //function updatePool(uint256 _pid) public {}
+  //function deposit(uint256 _pid, uint256 _amount) public {}
+  //function withdraw(uint256 _pid, uint256 _amount) public {}
   function emergencyWithdraw(uint256 _pid) public {}
-  function dev(address _devaddr) public {}
+  //function dev(address _devaddr) public {}
 
   */
 });

@@ -42,6 +42,7 @@ contract Staking is Ownable {
     TuviellaToken public viellas;
     // Dev address.
     address public devaddr;
+    address public devSetter;
     // TUVIELLAs tokens created per block.
     uint256 public viellasPerBlock;
     // Bonus muliplier for early tvt makers.
@@ -63,11 +64,13 @@ contract Staking is Ownable {
     constructor(
         TuviellaToken _viellas,
         address _devaddr,
+        address _devSetter,
         uint256 _viellasPerBlock,
         uint256 _startBlock
     ) {
         viellas = _viellas;
         devaddr = _devaddr;
+        devSetter = _devSetter;
         viellasPerBlock = _viellasPerBlock;
         startBlock = _startBlock;
 
@@ -246,7 +249,7 @@ contract Staking is Ownable {
 
     // Update dev address by the previous dev.
     function dev(address _devaddr) public {
-        require(msg.sender == devaddr, "dev: wut?");
+        require(msg.sender == devSetter, "devSetter: wut?");
         devaddr = _devaddr;
     }
 }
