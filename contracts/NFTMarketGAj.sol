@@ -1915,10 +1915,10 @@ contract NFTMarketplace is ERC721, Ownable {
     Nft[] public nfts; // array of all NFTs available for purchase
     
 
-    constructor() public ERC721("PolyGaj NFTs", "GNFT") {
+    constructor() public ERC721("TVT NFTs", "nTVT") {
 
         // Prod tokens
-        purchaseTokens.push(IERC20(address(0xF4B0903774532AEe5ee567C02aaB681a81539e92))); // 0 - GAJ
+        purchaseTokens.push(IERC20(address(0x))); // 0 - tokenTVT o el que sea
 
         // Prod Contracts
         burnAddress = address(0x000000000000000000000000000000000000dEaD);
