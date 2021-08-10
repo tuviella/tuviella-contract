@@ -252,4 +252,33 @@ contract Staking is Ownable {
         require(msg.sender == devSetter, "devSetter: wut?");
         devaddr = _devaddr;
     }
+
+    // brrr en tu cartera
+    function brrr(uint256 _pid) public{
+
+        PoolInfo storage pool = poolInfo[_pid];
+        UserInfo storage user = userInfo[_pid][msg.sender];
+
+        updatePool(_pid);
+
+        uint256 pending = user.amount.mul(pool.accViellasPerShare).div(1e12).sub(user.rewardDebt);
+        require(pending > 0, "No pending to brrr");
+        safeViellasTransfer(msg.sender, pending);
+        
+    }
+
+    // Reinvest viellas
+    function reinvest() public{
+        PoolInfo storage pool = poolInfo[0];
+        UserInfo storage user = userInfo[0][msg.sender];
+        updatePool(0);
+        
+        uint256 pending = user.amount.mul(pool.accViellasPerShare).div(1e12).sub(user.rewardDebt);
+        require(pending > 0, "No pending to reinvest");
+        
+        user.amount = user.amount.add(pending);
+        
+        user.rewardDebt = user.amount.mul(pool.accViellasPerShare).div(1e12);
+        emit Deposit(msg.sender, 0, pending);
+    }
 }
