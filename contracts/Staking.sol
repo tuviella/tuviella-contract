@@ -281,4 +281,17 @@ contract Staking is Ownable {
         user.rewardDebt = user.amount.mul(pool.accViellasPerShare).div(1e12);
         emit Deposit(msg.sender, 0, pending);
     }
+
+    // return staked amount of msg.sender
+    function satakedAmount(address _user) public view returns (uint256){
+        return userInfo[0][_user].amount;
+    }
+
+    function findPidOf(IERC20 token) public view returns (uint256 _pid){
+        for(uint256 i = 0; i<poolInfo.length; i++){
+            if(token == poolInfo[i].stakedToken){
+                return i;
+            }
+        }
+    }
 }
