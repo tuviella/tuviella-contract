@@ -282,11 +282,6 @@ contract Staking is Ownable {
         emit Deposit(msg.sender, 0, pending);
     }
 
-    // returns staked amount of user
-    function satakedAmount(address _user) public view returns (uint256){
-        return userInfo[0][_user].amount;
-    }
-
     //returns the pid of the pool
     function findPidOf(IERC20 token) public view returns (uint256 _pid){
         for(uint256 i = 0; i<poolInfo.length; i++){

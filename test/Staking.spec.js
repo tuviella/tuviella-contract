@@ -103,11 +103,6 @@ contract('Staking', (accounts) => {
 
     assert.equal(condition, true, "devs: " + devsTotalReward + ", pools: " + Math.floor(poolsReward / 10) + ". Not equal");
   });
-  
-
-
-
-
 
 
   it('Only devSetter should change dev address', async () => {
@@ -133,6 +128,12 @@ contract('Staking', (accounts) => {
     }catch(ex){}
     assert.equal(viellas_addr, await stk.methods.devaddr().call(), "TuViellaToken is not dev addres");
 
+  });
+  
+
+  it('Should return the pid of a pool', async () => {
+    assert.equal(0, await stk.methods.findPidOf(viellas_addr).call(), "Pid is not correct");
+    assert.equal(1, await stk.methods.findPidOf(token_addr).call(), "Pid is not correct");
   });
 
 
