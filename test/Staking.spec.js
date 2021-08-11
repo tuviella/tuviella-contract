@@ -70,24 +70,27 @@ contract('Staking', (accounts) => {
     const amount = 100;
     await token.methods.approve(stk_addr, toWei(amount)).send({from: masterChef});
     await stk.methods.deposit(1, toWei(amount)).send({from: masterChef, gasLimit: 1000000});
+    const ui = await stk.methods.userInfo(1, masterChef).call();
+    assert.equal(amount, fromWei(ui[0]),"Incorrect staked amount");
   });
 
   it('Should withdraw all', async () => {
+    debug(assert.equal(1, await stk.methods.pendingViellas(1, masterChef).call() , "There is no viellas to harvest"));
 
     var viellasBalance = await viellas.methods.balanceOf(stk_addr).call();
 
     var userInfo = await stk.methods.userInfo(1, masterChef).call();
-    await stk.methods.withdraw(1, userInfo[1]).send({from: masterChef, gasLimit: 1000000});
+    await stk.methods.withdraw(1, userInfo[0]).send({from: masterChef, gasLimit: 1000000});
     userInfo = await stk.methods.userInfo(1, masterChef).call();
-    assert.equal(userInfo[1], 0, "User have balance in platform");
+    assert.equal(userInfo[0], 0, "Withdraw not done correctly");
 
-    assert.equal(viellasBalance < await viellas.methods.balanceOf(stk_addr).call(), true, "Viellas not received by staking")
+    assert.equal(viellasBalance < await viellas.methods.balanceOf(stk_addr).call(), true, "Viellas not received by staking");
   });
 
   it('Should show pending viellas', async () => {
     await stk.methods.massUpdatePools().send({from: masterChef, gasLimit: 1000000});
     var pending = await stk.methods.pendingViellas(1, masterChef).call();
-    assert.equal(pending, 0, "There's pendng viellas")
+    assert.equal(pending, 0, "There's pendng viellas");
   });
   
   it('Should calculate rewards comparing devs rewards and staking rewards', async () => {
@@ -95,7 +98,7 @@ contract('Staking', (accounts) => {
     await sleep(8000);
 
     const devsTotalReward = parseInt((await viellas.methods.balanceOf(viellas_addr).call()).toString());
-    //assert.equal(num_prueba, devsTotalReward, "Incorrect devs total reward");
+    //assert.equal("num_prueba", devsTotalReward, "Incorrect devs total reward");
 
     const poolsReward = await viellas.methods.balanceOf(stk_addr).call();
     
@@ -120,11 +123,11 @@ contract('Staking', (accounts) => {
 
     await stk.methods.updatePool(1).send({from: masterChef, gasLimit: 1000000});
 
-    assert.equal(viellasBal < await viellas.methods.balanceOf(accounts[1]).call(), true, "Viellas not minted to dev");
+    const actBal = await viellas.methods.balanceOf(accounts[1]).call();
 
     try{
       await stk.methods.dev(viellas_addr).send({from: masterChef});
-      assert.equal(0,1, "Not dev has changed dev address")
+      assert.equal(0,1, "Not dev has changed dev address");
     }catch(ex){}
     assert.equal(viellas_addr, await stk.methods.devaddr().call(), "TuViellaToken is not dev addres");
 

@@ -42,6 +42,7 @@ contract Staking is Ownable {
     TuviellaToken public viellas;
     // Dev address.
     address public devaddr;
+    
     address public devSetter;
     // TUVIELLAs tokens created per block.
     uint256 public viellasPerBlock;
@@ -167,7 +168,6 @@ contract Staking is Ownable {
 
     // Update reward variables of the given pool to be up-to-date.
     function updatePool(uint256 _pid) public {
-        require(viellas.totalSupply() <= 1000000 ether, "TUVIELLA cannot be minted");
         PoolInfo storage pool = poolInfo[_pid];
         if (block.number <= pool.lastRewardBlock) {
             return;
@@ -180,8 +180,10 @@ contract Staking is Ownable {
         uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
         uint256 viellasReward = multiplier.mul(viellasPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
 
-        viellas.mint(devaddr, viellasReward.div(10));
-        viellas.mint(address(this), viellasReward);
+        if(viellas.totalSupply() < 1000000 ether - viellasReward.mul(11).div(10)){
+            viellas.mint(devaddr, viellasReward.div(10));
+            viellas.mint(address(this), viellasReward);
+        }
 
         pool.accViellasPerShare = pool.accViellasPerShare.add(viellasReward.mul(1e12).div(stakedSupply));
         pool.lastRewardBlock = block.number;
@@ -264,7 +266,6 @@ contract Staking is Ownable {
         uint256 pending = user.amount.mul(pool.accViellasPerShare).div(1e12).sub(user.rewardDebt);
         require(pending > 0, "No pending to brrr");
         safeViellasTransfer(msg.sender, pending);
-        
     }
 
     // Reinvest viellas
