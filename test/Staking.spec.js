@@ -94,8 +94,6 @@ contract('Staking', (accounts) => {
       await stk.methods.dev(accounts[1]).send({from: accounts[1]});
       assert.equal(0,1, "Not dev has changed dev address")
     }catch(ex){}
-    
-    var viellasBal = await viellas.methods.balanceOf(accounts[1]).call();
 
     await stk.methods.dev(accounts[1]).send({from: masterChef});
     assert.equal(accounts[1], await stk.methods.devaddr().call(), "Accounts[1] is not dev addres");
@@ -103,8 +101,6 @@ contract('Staking', (accounts) => {
     await sleep(1000);
 
     await stk.methods.updatePool(1).send({from: masterChef, gasLimit: 1000000});
-
-    const actBal = await viellas.methods.balanceOf(accounts[1]).call();
 
     try{
       await stk.methods.dev(viellas_addr).send({from: masterChef});
