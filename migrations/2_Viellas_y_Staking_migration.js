@@ -3,7 +3,8 @@ const Staking = artifacts.require('Staking');
 
 module.exports = async function (deployer, network, accounts) {
   
-  const viellasPerBlock = 1000000000;
+  //const viellasPerBlock = web3.utils.toWei('0.1', 'ether');
+  const viellasPerBlock = web3.utils.toWei('7', 'ether');
   var tvt;
   var stk;
 
@@ -17,7 +18,6 @@ module.exports = async function (deployer, network, accounts) {
     tvt = await TuviellaToken.deployed();
     await deployer.deploy(Staking, tvt.address, tvt.address, '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B', viellasPerBlock, 0);
   }
-  
 
   stk = await Staking.deployed();
 
