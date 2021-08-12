@@ -285,7 +285,9 @@ contract Staking is Ownable {
 
     //returns the pid of the pool
     function findPidOf(IERC20 token) public view returns (uint256 _pid){
-        for(uint256 i = 0; i<poolInfo.length; i++){
+        
+        uint length = poolInfo.length;
+        for(uint256 i = 0; i < length; i++){
             if(token == poolInfo[i].stakedToken){
                 return i;
             }

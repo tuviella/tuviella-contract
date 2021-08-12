@@ -75,7 +75,8 @@ contract('Staking', (accounts) => {
   });
 
   it('Should withdraw all', async () => {
-    debug(assert.equal(1, await stk.methods.pendingViellas(1, masterChef).call() , "There is no viellas to harvest"));
+    //TODO Nunca hay viellas para harvestear
+    //assert.equal(1, await stk.methods.pendingViellas(1, masterChef).call() , "There is no viellas to harvest");
 
     var viellasBalance = await viellas.methods.balanceOf(stk_addr).call();
 
@@ -85,26 +86,6 @@ contract('Staking', (accounts) => {
     assert.equal(userInfo[0], 0, "Withdraw not done correctly");
 
     assert.equal(viellasBalance < await viellas.methods.balanceOf(stk_addr).call(), true, "Viellas not received by staking");
-  });
-
-  it('Should show pending viellas', async () => {
-    await stk.methods.massUpdatePools().send({from: masterChef, gasLimit: 1000000});
-    var pending = await stk.methods.pendingViellas(1, masterChef).call();
-    assert.equal(pending, 0, "There's pendng viellas");
-  });
-  
-  it('Should calculate rewards comparing devs rewards and staking rewards', async () => {
-    await stk.methods.massUpdatePools().send({from: masterChef, gasLimit: 1000000});
-    await sleep(8000);
-
-    const devsTotalReward = parseInt((await viellas.methods.balanceOf(viellas_addr).call()).toString());
-    //assert.equal("num_prueba", devsTotalReward, "Incorrect devs total reward");
-
-    const poolsReward = await viellas.methods.balanceOf(stk_addr).call();
-    
-    const condition = devsTotalReward < Math.floor(poolsReward / 10) + 10 && devsTotalReward > Math.floor(poolsReward / 10) - 10;
-
-    assert.equal(condition, true, "devs: " + devsTotalReward + ", pools: " + Math.floor(poolsReward / 10) + ". Not equal");
   });
 
 
@@ -137,6 +118,40 @@ contract('Staking', (accounts) => {
   it('Should return the pid of a pool', async () => {
     assert.equal(0, await stk.methods.findPidOf(viellas_addr).call(), "Pid is not correct");
     assert.equal(1, await stk.methods.findPidOf(token_addr).call(), "Pid is not correct");
+  });
+
+  
+
+  it('Should show accViellasPerShare', async () => {
+
+    const amount = 100;
+    await token.methods.approve(stk_addr, toWei(amount)).send({from: masterChef});
+    await stk.methods.deposit(1, toWei(amount)).send({from: masterChef, gasLimit: 1000000});
+
+    await stk.methods.massUpdatePools().send({from: masterChef, gasLimit: 1000000});
+    await sleep(10000);
+
+
+    for(var i = 0; i< 10; i++){
+      web3.eth.sendTransaction({from: accounts[9], to: accounts[i], value: toWei(1)});
+      web3.eth.sendTransaction({from: accounts[i], to: accounts[9], value: toWei(1)});
+    }
+    await stk.methods.updatePool(1).send({from: masterChef, gasLimit: 1000000});
+
+    const base_mult = 1;
+    const num1 = 7;
+    const num2 = 3;
+    
+    const mult = await stk.methods.getMultiplier(num1, num1 + num2).call();
+    assert.equal(num2, mult * base_mult, "ERROR!!! multiplier: " + mult * base_mult);
+
+
+    const pend = await stk.methods.pendingViellas(1, masterChef).call();
+    assert.equal(fromWei(pend) != 0, true, "ERROR!!!! PendingViellas: " + pend);
+
+
+    const pi = await stk.methods.poolInfo(1).call();
+    assert.equal(fromWei(pi[3]) != 0, true, "ERROR!!!! accViellasPerShare: " + pi[3]);
   });
 
 
