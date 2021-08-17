@@ -257,10 +257,21 @@ contract Staking is Ownable {
 
     // brrr en tu cartera
     function brrr(uint256 _pid) public{
-        
-        updatePool(_pid);
 
-        uint256 pending = pendingViellas(_pid, msg.sender);
+        updatePool(_pid);
+        
+        PoolInfo storage pool = poolInfo[_pid];
+        UserInfo storage user = userInfo[_pid][msg.sender];
+        uint256 accViellasPerShare = pool.accViellasPerShare;
+        uint256 stakedSupply = pool.stakedToken.balanceOf(address(this));
+        if (block.number > pool.lastRewardBlock && stakedSupply != 0) {
+            uint256 multiplier = getMultiplier(pool.lastRewardBlock, block.number);
+            uint256 viellasReward = multiplier.mul(viellasPerBlock).mul(pool.allocPoint).div(totalAllocPoint);
+            accViellasPerShare = accViellasPerShare.add(viellasReward.mul(1e12).div(stakedSupply));
+        }
+
+        uint256 pending = user.amount.mul(accViellasPerShare).div(1e12).sub(user.rewardDebt);
+
         require(pending > 0, "No pending to brrr");
         safeViellasTransfer(msg.sender, pending);
         user.rewardDebt += pending;
