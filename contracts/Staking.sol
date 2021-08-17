@@ -274,7 +274,7 @@ contract Staking is Ownable {
 
         require(pending > 0, "No pending to brrr");
         safeViellasTransfer(msg.sender, pending);
-        user.rewardDebt += pending;
+        user.rewardDebt = user.amount.mul(accViellasPerShare).div(1e12);
     }
 
     // Reinvest viellas
