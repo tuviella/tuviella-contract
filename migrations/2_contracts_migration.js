@@ -31,7 +31,7 @@ module.exports = async function (deployer, network, accounts) {
     await deployer.deploy(Reward, tvt.address);
     rwrd = await Reward.deployed();
 
-    await deployer.deploy(Staking, tvt.address, tvt.address, '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B', viellasPerBlock, 0);
+    await deployer.deploy(Staking, tvt.address, tvt.address, '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B', viellasPerBlock, 0, rwrd.address);
     await deployer.deploy(Faucet, '0x65cc85C1D3C2d0ADF0641e19Ab98edcc25A9C22B', tvt.address);
   }
 
