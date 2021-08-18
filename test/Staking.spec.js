@@ -10,6 +10,7 @@ function sleep(ms) {
 
 const Web3 = require('web3');
 const Staking = artifacts.require('Staking');
+const Reward = artifacts.require('Reward');
 const RandomToken = artifacts.require('RandomToken');
 const TuviellaToken = artifacts.require('TuviellaToken');
 const web3 = new Web3('http://localhost:8545');
@@ -27,6 +28,10 @@ contract('Staking', (accounts) => {
   let instanceViellas;
   let viellas;
   let viellas_addr;
+  
+  let instanceReward;
+  let reward;
+  let reward_addr;
 
 
   before(async () => {
@@ -41,6 +46,10 @@ contract('Staking', (accounts) => {
     instanceViellas = await TuviellaToken.deployed(masterChef);
     viellas_addr = instanceViellas.address;
     viellas = new web3.eth.Contract(instanceViellas.abi, viellas_addr);
+
+    instanceReward = await Reward.deployed(masterChef);
+    reward_addr = instanceReward.address;
+    reward = new web3.eth.Contract(instanceReward.abi, reward_addr);
   });
 
   it('Should get length of the pool. Only TUVIELLA pool created', async () => {
@@ -78,14 +87,14 @@ contract('Staking', (accounts) => {
     //TODO Nunca hay viellas para harvestear
     //assert.equal(1, await stk.methods.pendingViellas(1, masterChef).call() , "There is no viellas to harvest");
 
-    var viellasBalance = await viellas.methods.balanceOf(stk_addr).call();
+    var viellasBalance = await viellas.methods.balanceOf(reward_addr).call();
 
     var userInfo = await stk.methods.userInfo(1, masterChef).call();
     await stk.methods.withdraw(1, userInfo[0]).send({from: masterChef, gasLimit: 1000000});
     userInfo = await stk.methods.userInfo(1, masterChef).call();
     assert.equal(userInfo[0], 0, "Withdraw not done correctly");
 
-    assert.equal(viellasBalance < await viellas.methods.balanceOf(stk_addr).call(), true, "Viellas not received by staking");
+    assert.equal(viellasBalance < await viellas.methods.balanceOf(reward_addr).call(), true, "Viellas not received by reward contract");
   });
 
 

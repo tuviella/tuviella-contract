@@ -1,0 +1,4 @@
+export const developmentTuViellaAddress = "0x0cF5c9119b276C7790D79B317dd7b27D71C0a569"
+export const developmentFaucetAddress = "0xaf3A6d7932dF69f12B42Fd90BcD3042AAAF4bE53"
+export const developmentStakingAddress = "0x067a6212F749E6d5C06f8137f5800f7aaeec3743"
+export const developmentRandomTokenAddress = "0x79302175Ec695b70058aa1C3CE7BD8Cc17F0aA06"

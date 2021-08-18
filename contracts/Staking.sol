@@ -9,6 +9,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./token/TuviellaToken.sol";
 
+interface IReward {
+    function payTo(address _to, uint256 _amount) external;
+}
+
 contract Staking is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
@@ -40,6 +44,8 @@ contract Staking is Ownable {
 
     // The TUVIELLA TOKEN!
     TuviellaToken public viellas;
+
+    IReward public rewardContract;
     // Dev address.
     address public devaddr;
     
@@ -67,13 +73,15 @@ contract Staking is Ownable {
         address _devaddr,
         address _devSetter,
         uint256 _viellasPerBlock,
-        uint256 _startBlock
+        uint256 _startBlock,
+        IReward _rewardContract
     ) {
         viellas = _viellas;
         devaddr = _devaddr;
         devSetter = _devSetter;
         viellasPerBlock = _viellasPerBlock;
         startBlock = _startBlock;
+        rewardContract = _rewardContract;
 
         // staking pool
         poolInfo.push(PoolInfo({
@@ -182,7 +190,7 @@ contract Staking is Ownable {
 
         if(viellas.totalSupply() < 1000000 ether - viellasReward.mul(11).div(10)){
             viellas.mint(devaddr, viellasReward.div(10));
-            viellas.mint(address(this), viellasReward);
+            viellas.mint(address(rewardContract), viellasReward);
         }
 
         pool.accViellasPerShare = pool.accViellasPerShare.add(viellasReward.mul(1e12).div(stakedSupply));
@@ -198,7 +206,7 @@ contract Staking is Ownable {
         if (user.amount > 0) {
             uint256 pending = user.amount.mul(pool.accViellasPerShare).div(1e12).sub(user.rewardDebt);
             if(pending > 0) {
-                safeViellasTransfer(msg.sender, pending);
+                rewardContract.payTo(msg.sender, pending);
             }
         }
         if (_amount > 0) {
@@ -219,7 +227,7 @@ contract Staking is Ownable {
         updatePool(_pid);
         uint256 pending = user.amount.mul(pool.accViellasPerShare).div(1e12).sub(user.rewardDebt);
         if(pending > 0) {
-            safeViellasTransfer(msg.sender, pending);
+            rewardContract.payTo(msg.sender, pending);
         }
         if(_amount > 0) {
             user.amount = user.amount.sub(_amount);
@@ -237,16 +245,6 @@ contract Staking is Ownable {
         emit EmergencyWithdraw(msg.sender, _pid, user.amount);
         user.amount = 0;
         user.rewardDebt = 0;
-    }
-
-    // Safe cake transfer function, just in case if rounding error causes pool to not have enough CAKEs.
-    function safeViellasTransfer(address _to, uint256 _amount) internal {
-        uint256 viellasBalance = viellas.balanceOf(address(this));
-        if (_amount > viellasBalance) {
-            viellas.transfer(_to, viellasBalance);
-        } else {
-            viellas.transfer(_to, _amount);
-        }
     }
 
     // Update dev address by the previous dev.
@@ -273,7 +271,7 @@ contract Staking is Ownable {
         uint256 pending = user.amount.mul(accViellasPerShare).div(1e12).sub(user.rewardDebt);
 
         require(pending > 0, "No pending to brrr");
-        safeViellasTransfer(msg.sender, pending);
+        rewardContract.payTo(msg.sender, pending);
         user.rewardDebt = user.amount.mul(accViellasPerShare).div(1e12);
     }
 
@@ -285,8 +283,9 @@ contract Staking is Ownable {
         
         uint256 pending = user.amount.mul(pool.accViellasPerShare).div(1e12).sub(user.rewardDebt);
         require(pending > 0, "No pending to reinvest");
-        
-        user.amount = user.amount.add(pending);
+
+        rewardContract.payTo(address(this), pending);
+        user.amount = user.amount.add(pending - pending.mul(7).div(1000));
         
         user.rewardDebt = user.amount.mul(pool.accViellasPerShare).div(1e12);
         emit Deposit(msg.sender, 0, pending);
