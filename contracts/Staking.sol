@@ -52,6 +52,8 @@ contract Staking is Ownable {
     address public devSetter;
     // TUVIELLAs tokens created per block.
     uint256 public viellasPerBlock;
+
+    uint256 public initialViellasPerBlock;
     // Bonus muliplier for early tvt makers.
     uint256 public BONUS_MULTIPLIER = 1;
 
@@ -90,8 +92,8 @@ contract Staking is Ownable {
             lastRewardBlock: startBlock,
             accViellasPerShare: 0
         }));
-
         totalAllocPoint = 1000;
+        initialViellasPerBlock = viellasPerBlock;
 
     }
 
@@ -300,5 +302,24 @@ contract Staking is Ownable {
                 return i;
             }
         }
+    }
+
+    function halving() external onlyOwner{
+        
+        if(block.number > startBlock){
+            return;
+        }
+
+        uint256 blocksPassed = block.number - startBlock;
+        uint256 blocksPerHalving = 0;
+
+        uint256 pot = blocksPassed.div(blocksPerHalving);
+
+        uint256 targetViellas = initialViellasPerBlock.div(2**pot);
+
+        if(viellasPerBlock == targetViellas){
+            return;
+        }
+        viellasPerBlock = targetViellas;
     }
 }
